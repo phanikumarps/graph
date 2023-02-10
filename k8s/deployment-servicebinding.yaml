@@ -1,0 +1,18 @@
+apiVersion: gateway.kyma-project.io/v1beta1
+kind: APIRule
+metadata:
+  name: graph
+spec:
+  gateway: kyma-gateway.kyma-system.svc.cluster.local
+  host: graph
+  service:
+    name: graph
+    port: 80
+  rules:
+    - path: /.*
+      accessStrategies:
+        - config: {}
+          handler: noop
+      methods:
+        - GET
+        - POST

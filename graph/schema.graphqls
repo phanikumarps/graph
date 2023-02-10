@@ -1,28 +1,61 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
-
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
-
-type User {
-  id: ID!
-  name: String!
-}
-
+# Query is an entry point for the requests sent by the client.
+# This Query can be used to get an Account by its name and an array of Account available.
 type Query {
-  todos: [Todo!]!
+  account(id: ID!): Account
+  accounts(limit: Int): [Account]
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+type Account {
+  id: ID!
+  name: Name!
+  shippingAddress: Address!
+  creditCard: CreditCard!
+}
+
+type Name {
+  first: String!
+  last: String!
+}
+
+type Address {
+  country: String!
+  street: String!
+  state: String!
+  zip: String!
+  building: String!
+}
+
+type CreditCard {
+  number: String!
+  pin: Int!
+  expirationDate: String!
+}
+input NewName{
+  first: String!
+  last: String!
+}
+
+input NewAddress{
+  country: String!
+  street: String!
+  state: String!
+  zip: String!
+  building: String!
+}
+
+input NewCreditCard{
+  number: String!
+  pin: Int!
+  expirationDate: String!
+}
+
+input NewAccount{
+  id: ID!
+  name: NewName!
+  shippingAddress: NewAddress!
+  creditCard: NewCreditCard!
 }
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  createAccount(input: NewAccount!): Account!
 }

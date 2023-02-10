@@ -6,28 +6,56 @@ package graph
 
 import (
 	"context"
-	"crypto/rand"
-	"fmt"
-	"math/big"
 
 	"github.com/phanikumarps/graph/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	rand, _ := rand.Int(rand.Reader, big.NewInt(100))
-	todo := &model.Todo{
-		Text: input.Text,
-		ID:   fmt.Sprintf("T%d", rand),
-		User: &model.User{ID: input.UserID, Name: "user " + input.UserID},
+// CreateAccount is the resolver for the createAccount field.
+func (r *mutationResolver) CreateAccount(ctx context.Context, input model.NewAccount) (*model.Account, error) {
+	mockAcc := model.Account{
+		ID: input.ID,
+		Name: &model.Name{
+			First: input.Name.First,
+			Last:  input.Name.Last,
+		},
+		ShippingAddress: &model.Address{
+			Country:  input.ShippingAddress.Country,
+			Street:   input.ShippingAddress.Street,
+			State:    input.ShippingAddress.State,
+			Zip:      input.ShippingAddress.Zip,
+			Building: input.ShippingAddress.Building,
+		},
+		CreditCard: &model.CreditCard{
+			Number:         input.CreditCard.Number,
+			Pin:            input.CreditCard.Pin,
+			ExpirationDate: input.CreditCard.ExpirationDate,
+		},
 	}
-	r.todos = append(r.todos, todo)
-	return todo, nil
+	Accounts[input.ID] = &mockAcc
+	return &mockAcc, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
+// Account is the resolver for the account field.
+func (r *queryResolver) Account(ctx context.Context, id string) (*model.Account, error) {
+	if acc, ok := Accounts[id]; ok {
+		return acc, nil
+	} else {
+		return nil, nil
+	}
+}
+
+// Accounts is the resolver for the accounts field.
+func (r *queryResolver) Accounts(ctx context.Context, limit *int) ([]*model.Account, error) {
+	accArray := make([]*model.Account, 0, len(Accounts))
+	for _, v := range Accounts {
+		accArray = append(accArray, v)
+	}
+	l := *limit
+	if l > len(accArray) {
+		l = len(accArray)
+	}
+
+	return accArray[:l], nil
 }
 
 // Mutation returns MutationResolver implementation.
